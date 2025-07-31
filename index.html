@@ -2,137 +2,356 @@
 <html>
 <head>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Upload CraftLand Item</title>
+  <title>CraftLand Items</title>
   <style>
     body {
-      background-color: #000;
-      color: white;
-      font-family: sans-serif;
+      margin: 0;
+      background: #121212;
+      color: #e0e0e0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
       text-align: center;
-      padding: 20px;
+      background-image: radial-gradient(circle at 50% 50%, #1e1e1e 0%, #121212 100%);
     }
 
-    input, select, button {
-      margin: 10px;
-      padding: 10px;
+    #searchBox {
+      margin: 20px auto;
+      padding: 12px 15px;
       width: 80%;
+      max-width: 800px;
+      border-radius: 25px;
       font-size: 16px;
-      border-radius: 5px;
-      border: 1px solid #555;
-      background: #111;
-      color: white;
+      background: rgba(30, 30, 30, 0.8);
+      color: #e0e0e0;
+      border: 2px solid #7e57c2;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+      transition: all 0.3s ease;
+      position: sticky;
+      top: 10px;
+      z-index: 100;
     }
 
-    button {
-      background: #1e88e5;
-      cursor: pointer;
+    #searchBox:focus {
+      outline: none;
+      border-color: #b388ff;
+      box-shadow: 0 0 0 3px rgba(126, 87, 194, 0.3);
     }
 
-    #uploadBox {
-      width: 80%;
-      height: 150px;
-      border: 2px dashed #555;
-      margin: 10px auto;
+    #appContainer {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 15px;
+      padding: 15px;
+      max-width: 800px;
+      margin: 0 auto;
+      margin-top: 10px;
+    }
+
+    .app-icon {
+      transition: transform 0.2s ease;
       display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .app-icon:hover {
+      transform: scale(1.05);
+    }
+
+    .app-icon img {
+      width: 70px;
+      height: 70px;
+      border-radius: 15px;
+      cursor: pointer;
+      border: 2px solid #7e57c2;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+      transition: all 0.3s ease;
+      object-fit: cover;
+      background: #1e1e1e;
+    }
+
+    .app-icon img:hover {
+      border-color: #b388ff;
+      box-shadow: 0 6px 12px rgba(126, 87, 194, 0.4);
+    }
+
+    #uniquePage {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: rgba(18, 18, 18, 0.95);
+      backdrop-filter: blur(10px);
+      color: white;
+      display: none;
+      flex-direction: column;
       justify-content: center;
       align-items: center;
+      z-index: 999;
+      padding: 20px;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+
+    #uniquePage.active {
+      display: flex;
+      opacity: 1;
+    }
+
+    #uniquePage img {
+      width: 150px;
+      height: 150px;
+      border-radius: 25px;
+      border: 3px solid #7e57c2;
+      box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
+      margin-bottom: 20px;
+      object-fit: cover;
+      background: #1e1e1e;
+    }
+
+    #uniquePage h2 {
+      margin: 10px 0;
+      font-size: 24px;
+      color: #b388ff;
+      text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+      max-width: 80%;
+      word-wrap: break-word;
+    }
+
+    #uniquePage div {
+      margin: 8px 0;
+      font-size: 18px;
+      color: #e0e0e0;
+    }
+
+    #backBtn {
+      position: absolute;
+      top: 25px;
+      left: 25px;
+      background: rgba(126, 87, 194, 0.2);
+      color: #e0e0e0;
+      border: 2px solid #7e57c2;
+      padding: 8px 15px;
       cursor: pointer;
-      border-radius: 10px;
-      overflow: hidden;
+      border-radius: 25px;
+      font-weight: bold;
+      transition: all 0.3s ease;
     }
 
-    #uploadBox img {
-      max-height: 100%;
-      display: none;
+    #backBtn:hover {
+      background: rgba(126, 87, 194, 0.4);
+      transform: translateX(-3px);
     }
 
-    #uploadBox span {
-      color: #aaa;
+    #copyBtn {
+      background: #7e57c2;
+      color: white;
+      padding: 8px 15px;
+      border: none;
+      margin-left: 10px;
+      cursor: pointer;
+      border-radius: 25px;
+      font-weight: bold;
+      transition: all 0.3s ease;
     }
 
-    #status {
-      margin-top: 10px;
+    #copyBtn:hover {
+      background: #b388ff;
+      transform: translateY(-2px);
+    }
+
+    .info-label {
+      color: #b388ff;
+      font-weight: bold;
+    }
+
+    @media (max-width: 900px) {
+      #appContainer {
+        grid-template-columns: repeat(4, 1fr);
+        gap: 12px;
+        padding: 12px;
+      }
+      
+      .app-icon img {
+        width: 60px;
+        height: 60px;
+      }
+    }
+
+    @media (max-width: 700px) {
+      #appContainer {
+        grid-template-columns: repeat(4, 1fr);
+        gap: 10px;
+        padding: 10px;
+      }
+      
+      .app-icon img {
+        width: 50px;
+        height: 50px;
+      }
+      
+      #uniquePage img {
+        width: 120px;
+        height: 120px;
+      }
+    }
+
+    @media (max-width: 500px) {
+      #appContainer {
+        grid-template-columns: repeat(4, 1fr);
+        gap: 8px;
+        padding: 8px;
+      }
+      
+      .app-icon img {
+        width: 45px;
+        height: 45px;
+      }
+      
+      #uniquePage img {
+        width: 100px;
+        height: 100px;
+      }
+      
+      #uniquePage h2 {
+        font-size: 20px;
+      }
     }
   </style>
 </head>
 <body>
-  <h2>Upload CraftLand Item</h2>
 
-  <input type="text" id="appId" placeholder="Enter ID" />
-  <input type="text" id="appName" placeholder="Enter Name" />
-  <input type="text" id="appType" placeholder="Enter Type" />
-  <select id="gender">
-    <option value="Boy">Boy</option>
-    <option value="Girl">Girl</option>
-    <option value="Unisex">Unisex</option>
-  </select>
+  <input type="text" id="searchBox" placeholder="🔍 Search items..." />
+  <div id="appContainer"></div>
 
-  <div id="uploadBox" onclick="document.getElementById('appImage').click()">
-    <img id="previewImage" />
-    <span id="uploadText">Click to upload image</span>
+  <div id="uniquePage">
+    <button id="backBtn">← Back</button>
+    <img id="uniqueImage">
+    <h2 id="uniqueName"></h2>
+    <div><span class="info-label">Type:</span> <span id="uniqueType"></span></div>
+    <div><span class="info-label">Gender:</span> <span id="uniqueGender"></span></div>
+    <div><span class="info-label">ID:</span> <span id="appIdText"></span> <button id="copyBtn">Copy</button></div>
   </div>
-  <input type="file" id="appImage" accept="image/*" style="display:none" />
-
-  <button onclick="uploadApp()">Upload</button>
-  <div id="status"></div>
 
   <script>
-    const imgbbKey = "c0ae52d0f44278e4fc0aff3046544251";
-    const preview = document.getElementById("previewImage");
-    const uploadText = document.getElementById("uploadText");
+    const appContainer = document.getElementById("appContainer");
+    const searchBox = document.getElementById("searchBox");
 
-    document.getElementById("appImage").addEventListener("change", function () {
-      const file = this.files[0];
-      if (file) {
-        const reader = new FileReader();
-        reader.onload = e => {
-          preview.src = e.target.result;
-          preview.style.display = "block";
-          uploadText.style.display = "none";
-        };
-        reader.readAsDataURL(file);
+    const uniquePage = document.getElementById("uniquePage");
+    const uniqueImage = document.getElementById("uniqueImage");
+    const uniqueName = document.getElementById("uniqueName");
+    const uniqueType = document.getElementById("uniqueType");
+    const uniqueGender = document.getElementById("uniqueGender");
+    const appIdText = document.getElementById("appIdText");
+    const copyBtn = document.getElementById("copyBtn");
+    const backBtn = document.getElementById("backBtn");
+
+    let allApps = {};
+    let currentId = "";
+
+    async function fetchApps() {
+      try {
+        const res = await fetch("https://craftland1-default-rtdb.firebaseio.com/apps.json");
+        const data = await res.json();
+        allApps = data || {};
+        renderApps(allApps);
+      } catch (error) {
+        console.error("Error fetching apps:", error);
+        appContainer.innerHTML = '<div style="color: #ff5252; grid-column: 1/-1; padding: 20px;">Failed to load items. Please try again later.</div>';
+      }
+    }
+
+    function renderApps(appList) {
+      appContainer.innerHTML = '';
+      
+      if (Object.keys(appList).length === 0) {
+        appContainer.innerHTML = '<div style="color: #888; grid-column: 1/-1; padding: 20px;">No items found</div>';
+        return;
+      }
+      
+      for (let id in appList) {
+        const app = appList[id];
+        const div = document.createElement("div");
+        div.className = "app-icon";
+        div.innerHTML = `
+          <img src="${app.image || 'https://via.placeholder.com/70?text=No+Img'}" 
+               alt="${app.name}" 
+               title="${app.name}"
+               onclick="openUniquePage('${id}')">
+        `;
+        appContainer.appendChild(div);
+      }
+    }
+
+    function openUniquePage(id) {
+      const app = allApps[id];
+      currentId = id;
+      uniqueImage.src = app.image || 'https://via.placeholder.com/150?text=No+Image';
+      uniqueImage.alt = app.name;
+      uniqueName.textContent = app.name || "Unnamed Item";
+      uniqueType.textContent = app.type || "N/A";
+      uniqueGender.textContent = app.gender || "N/A";
+      appIdText.textContent = id;
+      
+      // Show with animation
+      uniquePage.classList.add("active");
+      document.body.style.overflow = "hidden";
+
+      // Push a state to the browser history
+      history.pushState({ page: "unique" }, "", `#item=${id}`);
+    }
+
+    function closeUniquePage() {
+      uniquePage.classList.remove("active");
+      document.body.style.overflow = "";
+    }
+
+    backBtn.onclick = closeUniquePage;
+
+    copyBtn.onclick = () => {
+      navigator.clipboard.writeText(currentId).then(() => {
+        copyBtn.innerText = "Copied!";
+        setTimeout(() => copyBtn.innerText = "Copy", 1500);
+      }).catch(err => {
+        console.error("Failed to copy:", err);
+        copyBtn.innerText = "Error";
+        setTimeout(() => copyBtn.innerText = "Copy", 1500);
+      });
+    };
+
+    searchBox.addEventListener("input", () => {
+      const term = searchBox.value.toLowerCase().trim();
+      if (!term) {
+        renderApps(allApps);
+        return;
+      }
+      
+      const filtered = {};
+      for (let id in allApps) {
+        const app = allApps[id];
+        const match = `${app.name || ''} ${app.type || ''} ${app.gender || ''}`.toLowerCase();
+        if (match.includes(term)) filtered[id] = app;
+      }
+      renderApps(filtered);
+    });
+
+    // Handle mobile or browser back button
+    window.addEventListener("popstate", function(event) {
+      if (uniquePage.classList.contains("active")) {
+        closeUniquePage();
       }
     });
 
-    async function uploadApp() {
-      const id = document.getElementById("appId").value.trim();
-      const name = document.getElementById("appName").value.trim();
-      const type = document.getElementById("appType").value.trim();
-      const gender = document.getElementById("gender").value;
-      const file = document.getElementById("appImage").files[0];
-      const status = document.getElementById("status");
-
-      if (!id || !name || !type || !gender || !file) {
-        status.textContent = "Please fill all fields.";
-        return;
+    // Handle direct link with hash
+    window.addEventListener("load", () => {
+      if (window.location.hash.startsWith("#item=")) {
+        const id = window.location.hash.split("=")[1];
+        if (id && allApps[id]) {
+          openUniquePage(id);
+        }
       }
+    });
 
-      status.textContent = "Uploading image...";
-
-      const formData = new FormData();
-      formData.append("image", file);
-
-      try {
-        const res = await fetch(`https://api.imgbb.com/1/upload?key=${imgbbKey}`, {
-          method: "POST",
-          body: formData
-        });
-        const data = await res.json();
-        const imageUrl = data.data.url;
-
-        const itemData = { name, type, gender, image: imageUrl };
-
-        await fetch(`https://craftland1-default-rtdb.firebaseio.com/apps/${id}.json`, {
-          method: "PUT",
-          body: JSON.stringify(itemData)
-        });
-
-        status.textContent = "✅ Upload successful!";
-      } catch (err) {
-        status.textContent = "❌ Upload failed.";
-        console.error(err);
-      }
-    }
+    fetchApps();
   </script>
 </body>
 </html>
